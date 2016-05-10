@@ -21,10 +21,6 @@ trait Configuration {
   lazy val switchHost = Try(config.getString("switch.host")).getOrElse("localhost")
   lazy val switchPort = Try(config.getInt("switch.port")).getOrElse(9090)
 
-  // epic config
-  lazy val epicHost = Try(config.getString("epic.host")).getOrElse("localhost")
-  lazy val epicPort = Try(config.getInt("epic.port")).getOrElse(8080)
-
   // cassandra db config
   lazy val cassandraHost = Try(config.getString("db.cassandra.host")).getOrElse("localhost")
   lazy val cassandraPort = Try(config.getInt("db.cassandra.port")).getOrElse(9160)

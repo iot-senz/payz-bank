@@ -1,12 +1,7 @@
 package actors
 
-import java.net.{InetAddress, InetSocketAddress}
-
 import actors.SenzSender.SenzMsg
-import akka.actor.{Actor, ActorRef, Props}
-import akka.io.Tcp._
-import akka.io.{IO, Tcp}
-import akka.util.ByteString
+import akka.actor.{Actor, Props}
 import components.TransDbComp
 import config.Configuration
 import org.slf4j.LoggerFactory
@@ -41,61 +36,18 @@ trait TransHandlerComp {
     // handle timeout in 5 seconds
     val timeoutCancellable = system.scheduler.scheduleOnce(5 seconds, self, TransTimeout)
 
-    // connect to epic tcp end
-    val remoteAddress = new InetSocketAddress(InetAddress.getByName(epicHost), epicPort)
-    IO(Tcp) ! Connect(remoteAddress)
-
     override def preStart() = {
       logger.debug("Start actor: " + context.self.path)
     }
 
     override def receive: Receive = {
-      case c@Connected(remote, local) =>
-        logger.debug("TCP connected")
-
-        // transMsg from trans
-        val transMsg = TransUtils.getTransMsg(trans)
-        val msgStream = new String(transMsg.msgStream)
-
-        logger.debug("Send TransMsg " + msgStream)
-
-        // send TransMsg
-        val connection = sender()
-        connection ! Register(self)
-        connection ! Write(ByteString(transMsg.msgStream))
-
-        // handler response
-        context become {
-          case CommandFailed(w: Write) =>
-            logger.error("CommandFailed[Failed to write]")
-          case Received(data) =>
-            val response = data.decodeString("UTF-8")
-            logger.debug("Received : " + response)
-
-            // cancel timer
-            timeoutCancellable.cancel()
-
-            handleResponse(response, connection)
-          case "close" =>
-            logger.debug("Close")
-            connection ! Close
-          case _: ConnectionClosed =>
-            logger.debug("ConnectionClosed")
-            context.stop(self)
-          case TransTimeout =>
-            // timeout
-            logger.error("TransTimeout")
-            logger.debug("Resend TransMsg " + msgStream)
-
-            // resend trans
-            connection ! Write(ByteString(transMsg.msgStream))
-        }
-      case CommandFailed(_: Connect) =>
-        // failed to connect
-        logger.error("CommandFailed[Failed to connect]")
+      case TransTimeout =>
+        // timeout
+        logger.error("TransTimeout")
+        handleResponse("response")
     }
 
-    def handleResponse(response: String, connection: ActorRef) = {
+    def handleResponse(response: String) = {
       // parse response and get 'TransResp'
       TransUtils.getTransResp(response) match {
         case TransResp(_, "00", _) =>
@@ -114,9 +66,6 @@ trait TransHandlerComp {
       // TODO status according to the response
       val senz = s"DATA #msg PUTDONE @${trans.agent} ^sdbltrans"
       senzSender ! SenzMsg(senz)
-
-      // disconnect from tcp
-      connection ! Close
     }
   }
 
