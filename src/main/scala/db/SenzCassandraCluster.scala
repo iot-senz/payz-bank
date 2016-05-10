@@ -23,5 +23,5 @@ trait SenzCassandraCluster extends Configuration {
       build()
   }
 
-  lazy val session: Session = cluster.connect("senz")
+  lazy val session: Session = cluster.connect("payz")
 }

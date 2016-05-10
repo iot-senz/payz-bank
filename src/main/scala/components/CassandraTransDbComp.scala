@@ -51,8 +51,8 @@ trait CassandraTransDbComp extends TransDbComp {
     override def createTrans(trans: Trans) = {
       // insert query
       val statement = QueryBuilder.insertInto("trans")
-        .value("agent", trans.agent)
-        .value("customer", trans.customer)
+        .value("from_account", trans.from_account)
+        .value("to_account", trans.to_account)
         .value("amount", trans.amount)
         .value("timestamp", trans.timestamp)
         .value("status", trans.status)
@@ -64,7 +64,7 @@ trait CassandraTransDbComp extends TransDbComp {
       // update query
       val statement = QueryBuilder.update("trans")
         .`with`(set("status", trans.status))
-        .where(QueryBuilder.eq("timestamp", trans.timestamp)).and(QueryBuilder.eq("agent", trans.agent))
+        .where(QueryBuilder.eq("timestamp", trans.timestamp)).and(QueryBuilder.eq("agent", trans.from_account))
 
       session.execute(statement)
     }

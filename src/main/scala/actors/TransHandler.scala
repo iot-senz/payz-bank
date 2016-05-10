@@ -60,11 +60,11 @@ trait TransHandlerComp {
 
       // update db
       // TODO update according to the status
-      transDb.updateTrans(Trans(trans.agent, trans.customer, trans.amount, trans.timestamp, "DONE"))
+      transDb.updateTrans(Trans(trans.from_account, trans.to_account, trans.amount, trans.timestamp, "DONE"))
 
       // send status back
       // TODO status according to the response
-      val senz = s"DATA #msg PUTDONE @${trans.agent} ^sdbltrans"
+      val senz = s"DATA #msg PUTDONE @${trans.from_account} ^sdbltrans"
       senzSender ! SenzMsg(senz)
     }
   }
