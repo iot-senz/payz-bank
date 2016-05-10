@@ -15,7 +15,7 @@ trait Configuration {
 
   // senz config
   lazy val switchName = Try(config.getString("senz.switch-name")).getOrElse("mysensors")
-  lazy val clientName = Try(config.getString("senz.client-name")).getOrElse("sdbltrans")
+  lazy val clientName = Try(config.getString("senz.client-name")).getOrElse("payzbank")
 
   // server config
   lazy val switchHost = Try(config.getString("switch.host")).getOrElse("localhost")
