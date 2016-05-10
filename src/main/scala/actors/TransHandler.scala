@@ -6,7 +6,6 @@ import components.TransDbComp
 import config.Configuration
 import org.slf4j.LoggerFactory
 import protocols.Trans
-import utils.TransUtils
 
 import scala.concurrent.duration._
 
