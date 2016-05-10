@@ -1,6 +1,6 @@
-package components
+package db
 
-import protocols.{Trans, Account}
+import protocols.{Account, Trans}
 
 
 /**

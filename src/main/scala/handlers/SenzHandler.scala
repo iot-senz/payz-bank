@@ -3,8 +3,7 @@ package handlers
 import actors.RegHandler.{RegDone, RegFail, Registered}
 import actors._
 import akka.actor.ActorContext
-import components.{CassandraTransDbComp, TransDbComp}
-import db.SenzCassandraCluster
+import db.{CassandraTransDbComp, TransDbComp, SenzCassandraCluster}
 import org.slf4j.LoggerFactory
 import protocols.{Senz, SenzType, SignatureVerificationFail}
 import utils.TransUtils

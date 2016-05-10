@@ -3,7 +3,7 @@ package actors
 import actors.SenzReader.InitReader
 import actors.SenzSender.SenzMsg
 import akka.actor.{Actor, Props}
-import components.TransDbComp
+import db.TransDbComp
 import org.slf4j.LoggerFactory
 import protocols.{Account, SignatureVerificationFail}
 import utils.SenzParser

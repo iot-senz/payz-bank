@@ -3,8 +3,7 @@ package actors
 import java.net.{DatagramPacket, DatagramSocket}
 
 import akka.actor.{Actor, Props}
-import components.CassandraTransDbComp
-import db.SenzCassandraCluster
+import db.{CassandraTransDbComp, SenzCassandraCluster}
 import handlers.SenzHandler
 import org.slf4j.LoggerFactory
 import utils.SenzParser

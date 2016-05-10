@@ -1,8 +1,7 @@
-package components
+package db
 
 import com.datastax.driver.core.querybuilder.QueryBuilder
 import com.datastax.driver.core.querybuilder.QueryBuilder._
-import db.SenzCassandraCluster
 import protocols.{Account, Trans}
 
 /**

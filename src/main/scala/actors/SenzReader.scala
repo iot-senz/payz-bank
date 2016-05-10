@@ -1,8 +1,7 @@
 package actors
 
 import akka.actor.{Actor, Props}
-import components.CassandraTransDbComp
-import db.SenzCassandraCluster
+import db.{CassandraTransDbComp, SenzCassandraCluster}
 import exceptions.EmptySenzException
 import org.slf4j.LoggerFactory
 import utils.SenzUtils

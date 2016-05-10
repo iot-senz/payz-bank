@@ -2,8 +2,8 @@ package actors
 
 import actors.SenzSender.SenzMsg
 import akka.actor.{Actor, Props}
-import components.TransDbComp
 import config.Configuration
+import db.TransDbComp
 import org.slf4j.LoggerFactory
 import protocols.Trans
 
