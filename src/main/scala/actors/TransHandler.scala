@@ -48,16 +48,6 @@ trait TransHandlerComp {
     }
 
     def handleResponse(response: String) = {
-      // parse response and get 'TransResp'
-      TransUtils.getTransResp(response) match {
-        case TransResp(_, "00", _) =>
-          logger.debug("Transaction done")
-        case TransResp(_, status, _) =>
-          logger.error("Transaction fail with stats: " + status)
-        case transResp =>
-          logger.error("Invalid response " + transResp)
-      }
-
       // update db
       // TODO update according to the status
       transDb.updateTrans(Trans(trans.from_account, trans.to_account, trans.amount, trans.timestamp, "DONE"))

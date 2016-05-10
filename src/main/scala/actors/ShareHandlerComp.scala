@@ -64,7 +64,7 @@ trait ShareHandlerComp {
         // parse senzMsg
         // create agent in db
         val senz = SenzParser.getSenz(senzMsg)
-        transDb.createAgent(Account(senz.receiver, senz.receiver))
+        transDb.createAccount(Account(senz.receiver, senz.receiver))
 
         // reinitialize reader
         senzReader ! InitReader

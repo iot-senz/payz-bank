@@ -11,9 +11,9 @@ trait TransDbComp {
   val transDb: TransDb
 
   trait TransDb {
-    def createAgent(agent: Account)
+    def createAccount(account: Account)
 
-    def getAgent(name: String): Option[Account]
+    def getAccount(name: String): Option[Account]
 
     def createTrans(trans: Trans)
 
