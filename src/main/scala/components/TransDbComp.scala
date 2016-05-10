@@ -1,6 +1,6 @@
 package components
 
-import protocols.{Trans, Agent}
+import protocols.{Trans, Account}
 
 
 /**
@@ -11,9 +11,9 @@ trait TransDbComp {
   val transDb: TransDb
 
   trait TransDb {
-    def createAgent(agent: Agent)
+    def createAgent(agent: Account)
 
-    def getAgent(name: String): Option[Agent]
+    def getAgent(name: String): Option[Account]
 
     def createTrans(trans: Trans)
 

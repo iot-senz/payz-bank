@@ -5,7 +5,7 @@ import actors.SenzSender.SenzMsg
 import akka.actor.{Actor, Props}
 import components.TransDbComp
 import org.slf4j.LoggerFactory
-import protocols.{Agent, SignatureVerificationFail}
+import protocols.{Account, SignatureVerificationFail}
 import utils.SenzParser
 
 import scala.concurrent.duration._
@@ -64,7 +64,7 @@ trait ShareHandlerComp {
         // parse senzMsg
         // create agent in db
         val senz = SenzParser.getSenz(senzMsg)
-        transDb.createAgent(Agent(senz.receiver, senz.receiver))
+        transDb.createAgent(Account(senz.receiver, senz.receiver))
 
         // reinitialize reader
         senzReader ! InitReader
