@@ -47,7 +47,6 @@ class SenzSender(socket: DatagramSocket) extends Actor with Configuration {
       val regSenzMsg = SenzUtils.getRegistrationSenzMsg
       context.actorOf(RegHandler.props(regSenzMsg), "RegHandler")
     case SenzMsg(msg) =>
-
       // sign senz
       val senzSignature = RSAUtils.signSenz(msg.trim.replaceAll(" ", ""))
       val signedSenz = s"$msg $senzSignature"

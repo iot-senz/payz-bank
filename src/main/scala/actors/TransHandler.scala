@@ -49,12 +49,14 @@ trait TransHandlerComp {
         // TODO handle according to MATM protocol
         transDb.createTrans(trans)
         transDb.transferMoney(trans)
+
+        sendResponse("DONE")
       case TransTimeout =>
         // timeout
         logger.error("TransTimeout")
     }
 
-    def sendResponse(response: String) = {
+    def sendResponse(status: String) = {
       // send status back
       val senz = s"DATA #msg PUTDONE @${trans.from_acc} ^payzbank"
       senzSender ! SenzMsg(senz)

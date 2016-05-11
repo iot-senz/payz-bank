@@ -85,12 +85,12 @@ trait CassandraPayzDbComp extends PayzDbComp {
 
     override def transferMoney(trans: Trans) = {
       updateAcc(trans.from_acc, 50)
-      updateAcc(trans.to_acc, 100)
+      //updateAcc(trans.to_acc, 100)
     }
 
     private def updateAcc(name: String, amount: Int) = {
       val updateStmt = QueryBuilder.update("acc")
-        .`with`(set("amount", amount))
+        .`with`(set("balance", amount))
         .where(QueryBuilder.eq("name", name))
 
       session.execute(updateStmt)
