@@ -49,7 +49,7 @@ trait ShareHandlerComp {
       case Share(senzMsg) =>
         logger.debug("SHARE received: " + senzMsg)
 
-        // TODO only share senz, if senz not already shared with given agent
+        // TODO only share senz, if senz not already shared with given user
         senzSender ! SenzMsg(senzMsg)
       case ShareDone =>
         // success
@@ -62,9 +62,9 @@ trait ShareHandlerComp {
         timeoutCancellable.cancel()
 
         // parse senzMsg
-        // create agent in db
+        // create acc in db
         val senz = SenzParser.getSenz(senzMsg)
-        transDb.createAccount(Acc(senz.receiver, senz.receiver))
+        transDb.createAcc(Acc(senz.receiver, senz.receiver))
 
         // reinitialize reader
         senzReader ! InitReader

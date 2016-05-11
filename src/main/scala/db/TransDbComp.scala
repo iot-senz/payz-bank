@@ -11,17 +11,17 @@ trait TransDbComp {
   val transDb: TransDb
 
   trait TransDb {
-    def createAccount(account: Acc)
+    def createAcc(acc: Acc)
 
-    def getAccount(name: String): Option[Acc]
-
-    def transferMoney(trans: Trans)
+    def getAcc(name: String): Option[Acc]
 
     def createTrans(trans: Trans)
 
     def updateTrans(trans: Trans)
 
-    def getTrans(agent: String, timestamp: String): Option[Trans]
+    def getTrans(from_acc: String, timestamp: String): Option[Trans]
+
+    def transferMoney(trans: Trans)
   }
 
 }
