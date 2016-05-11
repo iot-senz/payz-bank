@@ -31,11 +31,11 @@ class SenzSender(socket: DatagramSocket) extends Actor with Configuration {
   }
 
   override def supervisorStrategy = OneForOneStrategy() {
-    case _: NullPointerException =>
-      println("Restart child")
+    case e: NullPointerException =>
+      logger.error("Null pointer exception caught " + e)
       Restart
-    case _: Exception =>
-      println("Exception caught")
+    case e: Exception =>
+      logger.error("Exception caught " + e)
       Stop
   }
 

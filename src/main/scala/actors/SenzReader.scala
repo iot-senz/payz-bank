@@ -1,6 +1,7 @@
 package actors
 
-import akka.actor.{Actor, Props}
+import akka.actor.SupervisorStrategy.{Stop, Restart}
+import akka.actor.{OneForOneStrategy, Actor, Props}
 import db.{CassandraTransDbComp, SenzCassandraCluster}
 import exceptions.EmptySenzException
 import org.slf4j.LoggerFactory
@@ -21,6 +22,15 @@ class SenzReader extends Actor {
 
   override def preStart() = {
     logger.debug("Start actor: " + context.self.path)
+  }
+
+  override def supervisorStrategy = OneForOneStrategy() {
+    case e: NullPointerException =>
+      logger.error("Null pointer exception caught [RESTART]" + e)
+      Restart
+    case e: Exception =>
+      logger.error("Exception caught, [STOP] " + e)
+      Stop
   }
 
   override def receive: Receive = {
