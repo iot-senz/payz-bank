@@ -9,9 +9,7 @@ import protocols.Trans
 
 import scala.concurrent.duration._
 
-case class TransMsg(msgStream: Array[Byte])
-
-case class TransResp(esh: String, status: String, rst: String)
+case class InitTrans(trans: Trans)
 
 case class TransTimeout()
 
@@ -32,27 +30,32 @@ trait TransHandlerComp {
     // we need senz sender to send reply back
     val senzSender = context.actorSelection("/user/SenzSender")
 
+    // send message to self in order to init trans
+    val transCancellable = system.scheduler.scheduleOnce(0 seconds, self, InitTrans(trans))
+
     // handle timeout in 5 seconds
-    val timeoutCancellable = system.scheduler.scheduleOnce(5 seconds, self, TransTimeout)
+    //val timeoutCancellable = system.scheduler.scheduleOnce(5 seconds, self, TransTimeout)
 
     override def preStart() = {
-      logger.debug("Start actor: " + context.self.path)
+      logger.info("Start actor: " + context.self.path)
     }
 
     override def receive: Receive = {
+      case InitTrans(trans) =>
+        logger.info("InitTrans: [" + trans.from_acc + "] [" + trans.to_acc + "] [" + trans.amount + "]")
+
+        // create trans in db
+        // then transfer amount
+        // TODO handle according to MATM protocol
+        transDb.createTrans(trans)
+        transDb.transferMoney(trans)
       case TransTimeout =>
         // timeout
         logger.error("TransTimeout")
-        handleResponse("response")
     }
 
-    def handleResponse(response: String) = {
-      // update db
-      // TODO update according to the status
-      transDb.updateTrans(Trans(trans.from_acc, trans.to_acc, trans.amount, trans.timestamp, "DONE"))
-
+    def sendResponse(response: String) = {
       // send status back
-      // TODO status according to the response
       val senz = s"DATA #msg PUTDONE @${trans.from_acc} ^payzbank"
       senzSender ! SenzMsg(senz)
     }

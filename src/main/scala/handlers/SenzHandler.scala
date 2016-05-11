@@ -65,10 +65,6 @@ class SenzHandler {
           // new trans, so create and process it
           logger.debug("New Trans, process it: " + "[" + trans.from_acc + ", " + trans.to_acc + ", " + trans.amount + "]")
 
-          // save trans and transfer money
-          transDb.createTrans(trans)
-          transDb.transferMoney(trans)
-
           // transaction request via trans actor
           val transHandlerComp = new TransHandlerComp with CassandraTransDbComp with SenzCassandraCluster
           context.actorOf(transHandlerComp.TransHandler.props(trans))
