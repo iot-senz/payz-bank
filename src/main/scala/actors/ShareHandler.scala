@@ -47,10 +47,27 @@ trait ShareHandlerComp {
 
     override def receive: Receive = {
       case Share(senzMsg) =>
-        logger.debug("SHARE received: " + senzMsg)
+        logger.info("request to SHARE senz: " + senzMsg)
 
-        // TODO only share senz, if senz not already shared with given user
-        senzSender ! SenzMsg(senzMsg)
+        // parse and validate senz
+        val senz = SenzParser.getSenz(senzMsg)
+
+        // check account exists
+        transDb.getAcc(senz.receiver) match {
+          case Some(existingAcc) =>
+            logger.info("User exists: " + senz.receiver)
+            println(s"[ERROR] USER ACCOUNT '${senz.receiver}' ALREADY EXISTS")
+
+            // reinitialize reader
+            senzReader ! InitReader
+
+            // stop the actor
+            context.stop(self)
+          case None =>
+            logger.info("User NOT exists, so SHARE it: " + senz.receiver)
+            senzSender ! SenzMsg(senzMsg)
+        }
+
       case ShareDone =>
         // success
         logger.debug("ShareDone")
