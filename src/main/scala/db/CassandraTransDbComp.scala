@@ -17,10 +17,10 @@ trait CassandraTransDbComp extends TransDbComp {
 
     def init() = {
       // query to create account
-      val sqlCreateTableAccount = "CREATE TABLE IF NOT EXISTS account (name TEXT PRIMARY KEY, balance TEXT);"
+      val sqlCreateTableAccount = "CREATE TABLE IF NOT EXISTS acc(name TEXT PRIMARY KEY, balance Int);"
 
       // queries to create trans
-      val sqlCreateTableTrans = "CREATE TABLE IF NOT EXISTS trans(from_account TEXT, to_account TEXT, amount INT, timestamp TEXT, status TEXT,PRIMARY KEY(from_account, timestamp));";
+      val sqlCreateTableTrans = "CREATE TABLE IF NOT EXISTS trans(from_acc TEXT, to_acc TEXT, amount INT, timestamp TEXT, status TEXT,PRIMARY KEY(from_account, timestamp));";
 
       val sqlCreateIndexTransStatus = "CREATE INDEX trans_status on trans(status);"
     }
@@ -48,6 +48,11 @@ trait CassandraTransDbComp extends TransDbComp {
       else None
     }
 
+    def transferMoney(trans: Trans) = {
+      updateAccount(trans.from_account, 50)
+      updateAccount(trans.to_account, 100)
+    }
+
     override def createTrans(trans: Trans) = {
       // insert query
       val statement = QueryBuilder.insertInto("trans")
@@ -62,11 +67,11 @@ trait CassandraTransDbComp extends TransDbComp {
 
     override def updateTrans(trans: Trans) = {
       // update query
-      val statement = QueryBuilder.update("trans")
+      val updateStmt = QueryBuilder.update("trans")
         .`with`(set("status", trans.status))
         .where(QueryBuilder.eq("timestamp", trans.timestamp)).and(QueryBuilder.eq("name", trans.from_account))
 
-      session.execute(statement)
+      session.execute(updateStmt)
     }
 
     override def getTrans(agent: String, timestamp: String): Option[Trans] = {
@@ -82,6 +87,14 @@ trait CassandraTransDbComp extends TransDbComp {
       if (row != null) Some(Trans(row.getString("from_account"), row.getString("to_account"), row.getInt("amount"), row.getString("timestamp"), row.getString("status")))
       else None
     }
+  }
+
+  private def updateAccount(acc: String, amount: Int) = {
+    val updateStmt = QueryBuilder.update("account")
+      .`with`(set("amount", amount))
+      .where(QueryBuilder.eq("account", acc))
+
+    session.execute(updateStmt)
   }
 
 }

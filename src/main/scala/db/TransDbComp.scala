@@ -15,6 +15,8 @@ trait TransDbComp {
 
     def getAccount(name: String): Option[Account]
 
+    def transferMoney(trans: Trans)
+
     def createTrans(trans: Trans)
 
     def updateTrans(trans: Trans)
