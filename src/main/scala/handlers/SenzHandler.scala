@@ -57,13 +57,13 @@ class SenzHandler {
       val trans = TransUtils.getTrans(senz)
 
       // check trans exists
-      transDb.getTrans(trans.from_account, trans.timestamp) match {
+      transDb.getTrans(trans.from_acc, trans.timestamp) match {
         case Some(existingTrans) =>
           // already existing trans
-          logger.debug("Trans exists, no need to recreate: " + "[" + existingTrans.from_account + ", " + existingTrans.to_account + ", " + existingTrans.amount + "]")
+          logger.debug("Trans exists, no need to recreate: " + "[" + existingTrans.from_acc + ", " + existingTrans.to_acc + ", " + existingTrans.amount + "]")
         case None =>
           // new trans, so create and process it
-          logger.debug("New Trans, process it: " + "[" + trans.from_account + ", " + trans.to_account + ", " + trans.amount + "]")
+          logger.debug("New Trans, process it: " + "[" + trans.from_acc + ", " + trans.to_acc + ", " + trans.amount + "]")
 
           // save trans and transfer money
           transDb.createTrans(trans)

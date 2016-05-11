@@ -2,7 +2,7 @@ package db
 
 import com.datastax.driver.core.querybuilder.QueryBuilder
 import com.datastax.driver.core.querybuilder.QueryBuilder._
-import protocols.{Account, Trans}
+import protocols.{Acc, Trans}
 
 /**
  * Created by eranga on 2/2/16
@@ -25,7 +25,7 @@ trait CassandraTransDbComp extends TransDbComp {
       val sqlCreateIndexTransStatus = "CREATE INDEX trans_status on trans(status);"
     }
 
-    override def createAccount(account: Account) = {
+    override def createAccount(account: Acc) = {
       // insert query
       val statement = QueryBuilder.insertInto("account")
         .value("name", account.name)
@@ -34,7 +34,7 @@ trait CassandraTransDbComp extends TransDbComp {
       session.execute(statement)
     }
 
-    override def getAccount(name: String): Option[Account] = {
+    override def getAccount(name: String): Option[Acc] = {
       // select query
       val selectStmt = select().all()
         .from("account")
@@ -44,20 +44,20 @@ trait CassandraTransDbComp extends TransDbComp {
       val resultSet = session.execute(selectStmt)
       val row = resultSet.one()
 
-      if (row != null) Some(Account(row.getString("name"), row.getString("amount")))
+      if (row != null) Some(Acc(row.getString("name"), row.getString("amount")))
       else None
     }
 
     def transferMoney(trans: Trans) = {
-      updateAccount(trans.from_account, 50)
-      updateAccount(trans.to_account, 100)
+      updateAccount(trans.from_acc, 50)
+      updateAccount(trans.to_acc, 100)
     }
 
     override def createTrans(trans: Trans) = {
       // insert query
       val statement = QueryBuilder.insertInto("trans")
-        .value("from_account", trans.from_account)
-        .value("to_account", trans.to_account)
+        .value("from_account", trans.from_acc)
+        .value("to_account", trans.to_acc)
         .value("amount", trans.amount)
         .value("timestamp", trans.timestamp)
         .value("status", trans.status)
@@ -69,7 +69,7 @@ trait CassandraTransDbComp extends TransDbComp {
       // update query
       val updateStmt = QueryBuilder.update("trans")
         .`with`(set("status", trans.status))
-        .where(QueryBuilder.eq("timestamp", trans.timestamp)).and(QueryBuilder.eq("name", trans.from_account))
+        .where(QueryBuilder.eq("timestamp", trans.timestamp)).and(QueryBuilder.eq("name", trans.from_acc))
 
       session.execute(updateStmt)
     }

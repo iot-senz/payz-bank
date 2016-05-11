@@ -1,6 +1,6 @@
 package db
 
-import protocols.{Account, Trans}
+import protocols.{Acc, Trans}
 
 
 /**
@@ -11,9 +11,9 @@ trait TransDbComp {
   val transDb: TransDb
 
   trait TransDb {
-    def createAccount(account: Account)
+    def createAccount(account: Acc)
 
-    def getAccount(name: String): Option[Account]
+    def getAccount(name: String): Option[Acc]
 
     def transferMoney(trans: Trans)
 

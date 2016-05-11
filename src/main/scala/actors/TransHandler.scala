@@ -49,11 +49,11 @@ trait TransHandlerComp {
     def handleResponse(response: String) = {
       // update db
       // TODO update according to the status
-      transDb.updateTrans(Trans(trans.from_account, trans.to_account, trans.amount, trans.timestamp, "DONE"))
+      transDb.updateTrans(Trans(trans.from_acc, trans.to_acc, trans.amount, trans.timestamp, "DONE"))
 
       // send status back
       // TODO status according to the response
-      val senz = s"DATA #msg PUTDONE @${trans.from_account} ^payzbank"
+      val senz = s"DATA #msg PUTDONE @${trans.from_acc} ^payzbank"
       senzSender ! SenzMsg(senz)
     }
   }
