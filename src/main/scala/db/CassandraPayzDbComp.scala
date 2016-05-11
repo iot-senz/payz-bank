@@ -7,9 +7,9 @@ import protocols.{Acc, Trans}
 /**
  * Created by eranga on 2/2/16
  */
-trait CassandraTransDbComp extends TransDbComp {
+trait CassandraPayzDbComp extends PayzDbComp {
 
-  this: SenzCassandraCluster =>
+  this: PayzCassandraCluster =>
 
   val transDb = new CassandraTransDB
 

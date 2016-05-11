@@ -3,7 +3,7 @@ package actors
 import java.net.{DatagramPacket, DatagramSocket}
 
 import akka.actor.{Actor, Props}
-import db.{CassandraTransDbComp, SenzCassandraCluster}
+import db.{CassandraPayzDbComp, PayzCassandraCluster}
 import handlers.SenzHandler
 import org.slf4j.LoggerFactory
 import utils.SenzParser
@@ -20,7 +20,7 @@ class SenzListener(socket: DatagramSocket) extends Actor {
 
   import SenzListener._
 
-  val senzHandler = new SenzHandler with CassandraTransDbComp with SenzCassandraCluster
+  val senzHandler = new SenzHandler with CassandraPayzDbComp with PayzCassandraCluster
 
   def logger = LoggerFactory.getLogger(this.getClass)
 

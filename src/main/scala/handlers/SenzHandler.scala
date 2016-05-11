@@ -3,13 +3,13 @@ package handlers
 import actors.RegHandler.{RegDone, RegFail, Registered}
 import actors._
 import akka.actor.ActorContext
-import db.{CassandraTransDbComp, TransDbComp, SenzCassandraCluster}
+import db.{CassandraPayzDbComp, PayzDbComp, PayzCassandraCluster}
 import org.slf4j.LoggerFactory
 import protocols.{Senz, SenzType, SignatureVerificationFail}
 import utils.TransUtils
 
 class SenzHandler {
-  this: TransDbComp =>
+  this: PayzDbComp =>
 
   def logger = LoggerFactory.getLogger(this.getClass)
 
@@ -66,7 +66,7 @@ class SenzHandler {
           logger.debug("New Trans, process it: " + "[" + trans.from_acc + ", " + trans.to_acc + ", " + trans.amount + "]")
 
           // transaction request via trans actor
-          val transHandlerComp = new TransHandlerComp with CassandraTransDbComp with SenzCassandraCluster
+          val transHandlerComp = new TransHandlerComp with CassandraPayzDbComp with PayzCassandraCluster
           context.actorOf(transHandlerComp.TransHandler.props(trans))
       }
     }

@@ -3,7 +3,7 @@ package actors
 import actors.SenzSender.SenzMsg
 import akka.actor.{Actor, Props}
 import config.Configuration
-import db.TransDbComp
+import db.PayzDbComp
 import org.slf4j.LoggerFactory
 import protocols.Trans
 
@@ -15,7 +15,7 @@ case class TransTimeout()
 
 trait TransHandlerComp {
 
-  this: TransDbComp =>
+  this: PayzDbComp =>
 
   object TransHandler {
     def props(trans: Trans): Props = Props(new TransHandler(trans))

@@ -6,7 +6,7 @@ import protocols.{Acc, Trans}
 /**
  * Created by eranga on 2/2/16.
  */
-trait TransDbComp {
+trait PayzDbComp {
 
   val transDb: TransDb
 

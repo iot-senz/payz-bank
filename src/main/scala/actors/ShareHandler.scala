@@ -3,7 +3,7 @@ package actors
 import actors.SenzReader.InitReader
 import actors.SenzSender.SenzMsg
 import akka.actor.{Actor, Props}
-import db.TransDbComp
+import db.PayzDbComp
 import org.slf4j.LoggerFactory
 import protocols.{Acc, SignatureVerificationFail}
 import utils.SenzParser
@@ -20,7 +20,7 @@ case class ShareTimeout()
 
 trait ShareHandlerComp {
 
-  this: TransDbComp =>
+  this: PayzDbComp =>
 
   object ShareHandler {
     def props(senzMsg: String): Props = Props(new ShareHandler(senzMsg))

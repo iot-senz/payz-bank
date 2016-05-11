@@ -2,7 +2,7 @@ package actors
 
 import akka.actor.SupervisorStrategy.{Stop, Restart}
 import akka.actor.{OneForOneStrategy, Actor, Props}
-import db.{CassandraTransDbComp, SenzCassandraCluster}
+import db.{CassandraPayzDbComp, PayzCassandraCluster}
 import exceptions.EmptySenzException
 import org.slf4j.LoggerFactory
 import utils.SenzUtils
@@ -53,7 +53,7 @@ class SenzReader extends Actor {
         SenzUtils.isValidSenz(inputSenz)
 
         // handle share
-        val shareHandlerComp = new ShareHandlerComp with CassandraTransDbComp with SenzCassandraCluster
+        val shareHandlerComp = new ShareHandlerComp with CassandraPayzDbComp with PayzCassandraCluster
         context.actorOf(shareHandlerComp.ShareHandler.props(inputSenz))
       } catch {
         case e: EmptySenzException =>
