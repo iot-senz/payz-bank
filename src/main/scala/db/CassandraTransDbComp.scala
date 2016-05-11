@@ -29,7 +29,7 @@ trait CassandraTransDbComp extends TransDbComp {
       // insert query
       val statement = QueryBuilder.insertInto("acc")
         .value("name", acc.name)
-        .value("amount", acc.branch)
+        .value("amount", acc.balance)
 
       session.execute(statement)
     }
@@ -44,7 +44,7 @@ trait CassandraTransDbComp extends TransDbComp {
       val resultSet = session.execute(selectStmt)
       val row = resultSet.one()
 
-      if (row != null) Some(Acc(row.getString("name"), row.getString("amount")))
+      if (row != null) Some(Acc(row.getString("name"), row.getInt("amount")))
       else None
     }
 

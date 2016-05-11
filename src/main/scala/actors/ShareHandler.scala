@@ -62,9 +62,9 @@ trait ShareHandlerComp {
         timeoutCancellable.cancel()
 
         // parse senzMsg
-        // create acc in db
+        // create acc in db with 0 balance
         val senz = SenzParser.getSenz(senzMsg)
-        transDb.createAcc(Acc(senz.receiver, senz.receiver))
+        transDb.createAcc(Acc(senz.receiver, 0))
 
         // reinitialize reader
         senzReader ! InitReader
