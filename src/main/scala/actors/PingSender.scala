@@ -1,7 +1,8 @@
 package actors
 
 import actors.SenzSender.SenzMsg
-import akka.actor.{Actor, Props}
+import akka.actor.SupervisorStrategy.Stop
+import akka.actor.{OneForOneStrategy, Actor, Props}
 import org.slf4j.LoggerFactory
 import utils.SenzUtils
 
@@ -29,6 +30,12 @@ class PingSender extends Actor {
 
   override def preStart() = {
     logger.debug("Start actor: " + context.self.path)
+  }
+
+  override def supervisorStrategy = OneForOneStrategy() {
+    case e: Exception =>
+      logger.error("Exception caught, [STOP] " + e)
+      Stop
   }
 
   override def receive: Receive = {

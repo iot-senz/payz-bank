@@ -2,7 +2,8 @@ package actors
 
 import java.net.{DatagramPacket, DatagramSocket}
 
-import akka.actor.{Actor, Props}
+import akka.actor.SupervisorStrategy.Stop
+import akka.actor.{Actor, OneForOneStrategy, Props}
 import db.{CassandraPayzDbComp, PayzCassandraCluster}
 import handlers.SenzHandler
 import org.slf4j.LoggerFactory
@@ -26,6 +27,12 @@ class SenzListener(socket: DatagramSocket) extends Actor {
 
   override def preStart() = {
     logger.debug("Start actor: " + context.self.path)
+  }
+
+  override def supervisorStrategy = OneForOneStrategy() {
+    case e: Exception =>
+      logger.error("Exception caught, [STOP] " + e)
+      Stop
   }
 
   override def receive: Receive = {
