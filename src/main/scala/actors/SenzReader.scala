@@ -29,7 +29,7 @@ class SenzReader extends Actor {
       println()
       println()
       println("-----------------------------------------------")
-      println("ENTER #SENZ[SHARE #acc #amnt @agent ^sdbltrans]")
+      println("ENTER #SENZ[SHARE #acc #amnt @agent ^payzbank]")
       println("-----------------------------------------------")
       println()
 

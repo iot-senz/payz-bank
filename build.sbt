@@ -1,4 +1,4 @@
-name := "sdbl-trans"
+name := "payz-bank"
 
 version := "1.0"
 

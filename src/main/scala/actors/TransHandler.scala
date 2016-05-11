@@ -53,7 +53,7 @@ trait TransHandlerComp {
 
       // send status back
       // TODO status according to the response
-      val senz = s"DATA #msg PUTDONE @${trans.from_account} ^sdbltrans"
+      val senz = s"DATA #msg PUTDONE @${trans.from_account} ^payzbank"
       senzSender ! SenzMsg(senz)
     }
   }

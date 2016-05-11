@@ -21,8 +21,6 @@ ENV JAVA_HOME /usr/lib/jvm/java-7-oracle
 # set service variables
 ENV SWITCH_HOST dev.localhost
 ENV SWITCH_PORT 7070
-ENV EPIC_HOST dev.localhost
-ENV EPIC_PORT 8080
 ENV CASSANDRA_HOST dev.localhost
 ENV CASSANDRA_PORT 9090
 
@@ -30,7 +28,7 @@ ENV CASSANDRA_PORT 9090
 WORKDIR /app
 
 # copy file
-ADD target/scala-2.11/sdbl-trans-assembly-1.0.jar trans.jar
+ADD target/scala-2.11/payz-bank-assembly-1.0.jar trans.jar
 
 # logs volume
 RUN mkdir logs
