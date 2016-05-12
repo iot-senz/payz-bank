@@ -37,20 +37,27 @@ trait TransHandlerComp {
     //val timeoutCancellable = system.scheduler.scheduleOnce(5 seconds, self, TransTimeout)
 
     override def preStart() = {
-      logger.info("Start actor: " + context.self.path)
+      logger.info("[_________START ACTOR__________] " + context.self.path)
     }
 
     override def receive: Receive = {
       case InitTrans(trans) =>
         logger.info("InitTrans: [" + trans.from_acc + "] [" + trans.to_acc + "] [" + trans.amount + "]")
 
-        // create trans in db
-        // then transfer amount
         // TODO handle according to MATM protocol
-        transDb.createTrans(trans)
-        transDb.transferMoney(trans)
 
-        sendResponse("DONE")
+        // create trans in db
+        transDb.createTrans(trans)
+
+        // transfer money is error prone
+        try {
+          transDb.transferMoney(trans)
+          sendResponse("PUTDONE")
+        } catch {
+          case ex: Exception =>
+            logger.error("Fail to money transfer " + ex)
+            sendResponse("PUTFAIL")
+        }
       case TransTimeout =>
         // timeout
         logger.error("TransTimeout")
@@ -58,7 +65,7 @@ trait TransHandlerComp {
 
     def sendResponse(status: String) = {
       // send status back
-      val senz = s"DATA #msg PUTDONE @${trans.from_acc} ^payzbank"
+      val senz = s"DATA #msg $status @${trans.from_acc} ^payzbank"
       senzSender ! SenzMsg(senz)
     }
   }

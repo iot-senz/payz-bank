@@ -42,7 +42,7 @@ trait ShareHandlerComp {
     val timeoutCancellable = system.scheduler.scheduleOnce(10 seconds, self, ShareTimeout)
 
     override def preStart() = {
-      logger.debug("Start actor: " + context.self.path)
+      logger.info("[_________START ACTOR__________] " + context.self.path)
     }
 
     override def receive: Receive = {

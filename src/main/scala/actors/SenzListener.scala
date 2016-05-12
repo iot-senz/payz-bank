@@ -2,7 +2,7 @@ package actors
 
 import java.net.{DatagramPacket, DatagramSocket}
 
-import akka.actor.SupervisorStrategy.Stop
+import akka.actor.SupervisorStrategy.{Restart, Stop}
 import akka.actor.{Actor, OneForOneStrategy, Props}
 import db.{CassandraPayzDbComp, PayzCassandraCluster}
 import handlers.SenzHandler
@@ -26,10 +26,13 @@ class SenzListener(socket: DatagramSocket) extends Actor {
   def logger = LoggerFactory.getLogger(this.getClass)
 
   override def preStart() = {
-    logger.debug("Start actor: " + context.self.path)
+    logger.info("[_________START ACTOR__________] " + context.self.path)
   }
 
   override def supervisorStrategy = OneForOneStrategy() {
+    case e: NullPointerException =>
+      logger.error("Null pointer exception caught " + e)
+      Restart
     case e: Exception =>
       logger.error("Exception caught, [STOP] " + e)
       Stop

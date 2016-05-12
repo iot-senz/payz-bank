@@ -21,7 +21,7 @@ class SenzReader extends Actor {
   def logger = LoggerFactory.getLogger(this.getClass)
 
   override def preStart() = {
-    logger.debug("Start actor: " + context.self.path)
+    logger.info("[_________START ACTOR__________] " + context.self.path)
   }
 
   override def supervisorStrategy = OneForOneStrategy() {

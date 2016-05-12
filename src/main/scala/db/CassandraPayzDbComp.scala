@@ -84,8 +84,26 @@ trait CassandraPayzDbComp extends PayzDbComp {
     }
 
     override def transferMoney(trans: Trans) = {
-      updateAcc(trans.from_acc, 50)
-      //updateAcc(trans.to_acc, 100)
+      // find accounts
+      val from_acc = getAcc(trans.from_acc)
+      val to_acc = getAcc(trans.to_acc)
+
+      // validate from accounts
+      from_acc match {
+        case Some(acc) =>
+          // have account, check weather it has enough money to transfer
+          if (acc.balance <= trans.amount) throw new Exception("No balance to transfer")
+        case None =>
+          // No account, error
+          throw new Exception("No from_acc")
+      }
+
+      // validate to account
+      if (to_acc.isEmpty) throw new Exception("No to_acc")
+
+      // came here means no error, so update accounts
+      updateAcc(trans.from_acc, from_acc.get.balance - trans.amount)
+      updateAcc(trans.to_acc, to_acc.get.balance + trans.amount)
     }
 
     private def updateAcc(name: String, amount: Int) = {

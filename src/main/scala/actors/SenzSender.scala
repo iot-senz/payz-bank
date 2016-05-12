@@ -27,7 +27,7 @@ class SenzSender(socket: DatagramSocket) extends Actor with Configuration {
   def logger = LoggerFactory.getLogger(this.getClass)
 
   override def preStart() = {
-    logger.info("Start actor: " + context.self.path)
+    logger.info("[_________START ACTOR__________] " + context.self.path)
   }
 
   override def supervisorStrategy = OneForOneStrategy() {

@@ -1,7 +1,7 @@
 package actors
 
 import actors.SenzSender.SenzMsg
-import akka.actor.SupervisorStrategy.Stop
+import akka.actor.SupervisorStrategy.{Restart, Stop}
 import akka.actor.{OneForOneStrategy, Actor, Props}
 import org.slf4j.LoggerFactory
 import utils.SenzUtils
@@ -29,10 +29,13 @@ class PingSender extends Actor {
   def logger = LoggerFactory.getLogger(this.getClass)
 
   override def preStart() = {
-    logger.debug("Start actor: " + context.self.path)
+    logger.info("[_________START ACTOR__________] " + context.self.path)
   }
 
   override def supervisorStrategy = OneForOneStrategy() {
+    case e: NullPointerException =>
+      logger.error("Null pointer exception caught " + e)
+      Restart
     case e: Exception =>
       logger.error("Exception caught, [STOP] " + e)
       Stop
