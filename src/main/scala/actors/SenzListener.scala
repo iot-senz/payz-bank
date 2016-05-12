@@ -44,6 +44,7 @@ class SenzListener(socket: DatagramSocket) extends Actor {
 
       val buf = new Array[Byte](1024)
 
+      // TODO remove while loop and handle with Akka UDP
       // listen for udp socket in order to receive messages
       while (true) {
         // receiving packet
