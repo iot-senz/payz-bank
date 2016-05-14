@@ -6,7 +6,7 @@ import akka.actor.{Actor, Props}
 import db.PayzDbComp
 import org.slf4j.LoggerFactory
 import protocols.{Acc, SignatureVerificationFail}
-import utils.SenzParser
+import utils.{AccUtils, SenzParser}
 
 import scala.concurrent.duration._
 
@@ -81,7 +81,7 @@ trait ShareHandlerComp {
         // parse senzMsg
         // create acc in db with 0 balance
         val senz = SenzParser.getSenz(senzMsg)
-        transDb.createAcc(Acc(senz.receiver, 0))
+        transDb.createAcc(AccUtils.getAcc(senz))
 
         // reinitialize reader
         senzReader ! InitReader

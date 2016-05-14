@@ -2,7 +2,7 @@ package db
 
 import com.datastax.driver.core.querybuilder.QueryBuilder
 import com.datastax.driver.core.querybuilder.QueryBuilder._
-import protocols.{Acc, Trans}
+import protocols.{AccType, Acc, Trans}
 
 /**
  * Created by eranga on 2/2/16
@@ -13,11 +13,18 @@ trait CassandraPayzDbComp extends PayzDbComp {
 
   val transDb = new CassandraTransDB
 
+  object CassandraTransDB {
+    // can have minus balance for SHOP users
+    val TransLimit = -500
+  }
+
   class CassandraTransDB extends TransDb {
+
+    import CassandraTransDB._
 
     def init() = {
       // query to create acc
-      val sqlCreateTableAcc = "CREATE TABLE IF NOT EXISTS acc(name TEXT PRIMARY KEY, balance Int);"
+      val sqlCreateTableAcc = "CREATE TABLE IF NOT EXISTS acc(name TEXT PRIMARY KEY, balance Int, acc_type TEXT);"
 
       // queries to create trans
       val sqlCreateTableTrans = "CREATE TABLE IF NOT EXISTS trans(from_acc TEXT, to_acc TEXT, amount INT, timestamp TEXT, status TEXT,PRIMARY KEY(from_acc, timestamp));"
@@ -30,6 +37,7 @@ trait CassandraPayzDbComp extends PayzDbComp {
       val statement = QueryBuilder.insertInto("acc")
         .value("name", acc.name)
         .value("balance", acc.balance)
+        .value("acc_type", acc.accType.toString)
 
       session.execute(statement)
     }
@@ -44,7 +52,7 @@ trait CassandraPayzDbComp extends PayzDbComp {
       val resultSet = session.execute(selectStmt)
       val row = resultSet.one()
 
-      if (row != null) Some(Acc(row.getString("name"), row.getInt("balance")))
+      if (row != null) Some(Acc(row.getString("name"), row.getInt("balance"), AccType.withName(row.getString("acc_type"))))
       else None
     }
 
@@ -92,7 +100,8 @@ trait CassandraPayzDbComp extends PayzDbComp {
       from_acc match {
         case Some(acc) =>
           // have account, check weather it has enough money to transfer
-          if (acc.balance <= trans.amount) throw new Exception("No balance to transfer")
+          if (acc.balance <= TransLimit) throw new Exception(s"Trans limit exceed for $acc")
+          if (acc.balance - trans.amount <= TransLimit) throw new Exception("No balance to transfer")
         case None =>
           // No account, error
           throw new Exception("No from_acc")
