@@ -2,7 +2,7 @@ package protocols
 
 object AccType extends Enumeration {
   type AccType = Value
-  val SHOP, USER, ADMIN = Value
+  val SHOP, USER = Value
 }
 
 import AccType._

@@ -8,7 +8,7 @@ import protocols.{AccType, Acc, Senz}
 object AccUtils {
 
   def getAcc(senz: Senz): Acc = {
-    val name = senz.sender
+    val name = senz.receiver
     val balance = 0
     val accType = AccType.withName(senz.attributes.getOrElse("type", "user"))
 

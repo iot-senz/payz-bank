@@ -15,7 +15,7 @@ trait CassandraPayzDbComp extends PayzDbComp {
 
   object CassandraTransDB {
     // can have minus balance for SHOP users
-    val TransLimit = -500
+    val TransLimit: Int = -500
   }
 
   class CassandraTransDB extends TransDb {
@@ -98,10 +98,17 @@ trait CassandraPayzDbComp extends PayzDbComp {
 
       // validate from accounts
       from_acc match {
-        case Some(acc) =>
-          // have account, check weather it has enough money to transfer
-          if (acc.balance <= TransLimit) throw new Exception(s"Trans limit exceed for $acc")
-          if (acc.balance - trans.amount <= TransLimit) throw new Exception("No balance to transfer")
+        case Some(Acc(name, balance, AccType.SHOP)) =>
+          // top up
+          // check for credit limit
+          if (balance - trans.amount <= TransLimit) throw new Exception(s"Trans limit exceed of SHOP $name")
+        case Some(Acc(name, balance, AccType.USER)) =>
+          // transaction
+          // check for balance
+          if (balance < trans.amount) throw new Exception(s"No balance [$balance] to transfer in USER [$name]")
+        case Some(_) =>
+          // Un supported data
+          throw new Exception("Unsupported account type")
         case None =>
           // No account, error
           throw new Exception("No from_acc")
