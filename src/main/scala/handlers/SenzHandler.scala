@@ -57,7 +57,7 @@ class SenzHandler {
       val trans = TransUtils.getTrans(senz)
 
       // check trans exists
-      transDb.getTrans(trans.fromAcc, trans.timestamp) match {
+      transDb.getTrans(trans.tId) match {
         case Some(existingTrans) =>
           // already existing trans
           logger.debug("Trans exists, no need to recreate: " + "[" + existingTrans.fromAcc + ", " + existingTrans.toAcc + ", " + existingTrans.amount + "]")
