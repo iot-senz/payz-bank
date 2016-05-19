@@ -32,7 +32,7 @@ trait TransHandlerComp {
     val transCancellable = system.scheduler.scheduleOnce(0 seconds, self, trans)
 
     // handle timeout in 5 seconds
-    //val timeoutCancellable = system.scheduler.scheduleOnce(5 seconds, self, TransTimeout)
+    val timeoutCancellable = system.scheduler.scheduleOnce(60 seconds, self, TransTimeout)
 
     override def preStart() = {
       logger.info("[_________START ACTOR__________] " + context.self.path)
@@ -95,27 +95,21 @@ trait TransHandlerComp {
     def processMatmResponse(status: Option[String], trans: Trans) = {
       status match {
         case Some("DONE") =>
+          // transfer money now
           // transfer money is error prone
           try {
             payzDb.transferMoney(trans)
-            sendResponse("PUTDONE")
+            senzSender ! SenzMsg(s"DATA #msg DONE @${trans.fromAcc} ^payzbank")
+            senzSender ! SenzMsg(s"DATA #msg DONE @${trans.toAcc} ^payzbank")
           } catch {
             case ex: Exception =>
               logger.error("Fail to money transfer " + ex)
-              sendResponse("PUTFAIL")
+              senzSender ! SenzMsg(s"DATA #msg FAIL @${trans.fromAcc} ^payzbank")
+              senzSender ! SenzMsg(s"DATA #msg FAIL @${trans.toAcc} ^payzbank")
           }
-
-        // send status back
-
         case _ =>
-        // nothing to do
+          // nothing to do
       }
-    }
-
-    def sendResponse(status: String) = {
-      // send status back
-      val senz = s"DATA #msg $status @${trans.fromAcc} ^payzbank"
-      senzSender ! SenzMsg(senz)
     }
   }
 
