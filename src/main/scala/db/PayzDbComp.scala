@@ -19,7 +19,7 @@ trait PayzDbComp {
 
     def updateTrans(trans: Trans)
 
-    def getTrans(from_acc: String, timestamp: String): Option[Trans]
+    def getTrans(tId: String): Option[Trans]
 
     def transferMoney(trans: Trans)
   }

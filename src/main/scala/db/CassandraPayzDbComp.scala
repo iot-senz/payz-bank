@@ -27,7 +27,7 @@ trait CassandraPayzDbComp extends PayzDbComp {
       val sqlCreateTableAcc = "CREATE TABLE IF NOT EXISTS acc(name TEXT PRIMARY KEY, balance Int, acc_type TEXT);"
 
       // queries to create trans
-      val sqlCreateTableTrans = "CREATE TABLE IF NOT EXISTS trans(t_id TEXT, from_acc TEXT, to_acc TEXT, timestamp TEXT, amount INT, f_key, t_key, status TEXT, PRIMARY KEY(from_acc, to_acc, timestamp));"
+      val sqlCreateTableTrans = "CREATE TABLE IF NOT EXISTS trans(t_id TEXT PRIMARY KEY, from_acc TEXT, to_acc TEXT, timestamp TEXT, amount INT, f_key, t_key, status TEXT);"
 
       val sqlCreateIndexTransStatus = "CREATE INDEX trans_status on trans(status);"
     }
@@ -75,16 +75,16 @@ trait CassandraPayzDbComp extends PayzDbComp {
       // update query
       val updateStmt = QueryBuilder.update("trans")
         .`with`(set("status", trans.status))
-        .where(QueryBuilder.eq("timestamp", trans.timestamp)).and(QueryBuilder.eq("name", trans.fromAcc))
+        .where(QueryBuilder.eq("t_id", trans.tId))
 
       session.execute(updateStmt)
     }
 
-    override def getTrans(from_acc: String, timestamp: String): Option[Trans] = {
+    override def getTrans(tId: String): Option[Trans] = {
       // select query
       val selectStmt = select().all()
         .from("trans")
-        .where(QueryBuilder.eq("from_acc", from_acc)).and(QueryBuilder.eq("timestamp", timestamp))
+        .where(QueryBuilder.eq("t_id", tId))
         .limit(1)
 
       val resultSet = session.execute(selectStmt)
