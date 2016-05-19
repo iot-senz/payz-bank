@@ -8,9 +8,9 @@ import protocols.{Acc, Trans}
  */
 trait PayzDbComp {
 
-  val transDb: TransDb
+  val payzDb: PayzDb
 
-  trait TransDb {
+  trait PayzDb {
     def createAcc(acc: Acc)
 
     def getAcc(name: String): Option[Acc]

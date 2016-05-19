@@ -11,16 +11,16 @@ trait CassandraPayzDbComp extends PayzDbComp {
 
   this: PayzCassandraCluster =>
 
-  val transDb = new CassandraTransDB
+  val payzDb = new CassandraPayzDB
 
-  object CassandraTransDB {
+  object CassandraPayzDB {
     // can have minus balance for SHOP users
     val TransLimit: Int = -500
   }
 
-  class CassandraTransDB extends TransDb {
+  class CassandraPayzDB extends PayzDb {
 
-    import CassandraTransDB._
+    import CassandraPayzDB._
 
     def init() = {
       // query to create acc

@@ -53,7 +53,7 @@ trait ShareHandlerComp {
         val senz = SenzParser.getSenz(senzMsg)
 
         // check account exists
-        transDb.getAcc(senz.receiver) match {
+        payzDb.getAcc(senz.receiver) match {
           case Some(existingAcc) =>
             logger.info("User exists: " + senz.receiver)
             println(s"[ERROR] USER ACCOUNT '${senz.receiver}' ALREADY EXISTS")
@@ -81,7 +81,7 @@ trait ShareHandlerComp {
         // parse senzMsg
         // create acc in db with 0 balance
         val senz = SenzParser.getSenz(senzMsg)
-        transDb.createAcc(AccUtils.getAcc(senz))
+        payzDb.createAcc(AccUtils.getAcc(senz))
 
         // reinitialize reader
         senzReader ! InitReader

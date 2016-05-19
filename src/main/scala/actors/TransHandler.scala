@@ -43,7 +43,7 @@ trait TransHandlerComp {
         logger.info("InitTrans: [" + trans.fromAcc + "] [" + trans.toAcc + "] [" + trans.amount + "]")
 
         // create trans in db
-        transDb.createTrans(trans)
+        payzDb.createTrans(trans)
 
         // handle according to MATM protocol
         processTransResponse(trans)
@@ -75,17 +75,17 @@ trait TransHandlerComp {
     }
 
     def processMatm(matm: Matm): Option[String] = {
-      val trans = transDb.getTrans(matm.tId)
+      val trans = payzDb.getTrans(matm.tId)
       trans match {
         case Some(Trans(tId, fromAcc, toAcc, timestamp, amount, fKey, tKey, "INIT")) =>
           // INIT stage
           // update to PENDING
-          transDb.updateTransStatus(Trans(tId, fromAcc, toAcc, timestamp, amount, fKey, tKey, "PENDING"))
+          payzDb.updateTransStatus(Trans(tId, fromAcc, toAcc, timestamp, amount, fKey, tKey, "PENDING"))
           Some("PENDING")
         case Some(Trans(tId, fromAcc, toAcc, timestamp, amount, fKey, tKey, "PENDING")) =>
           // PENDING state
           // update to DONE
-          transDb.updateTransStatus(Trans(tId, fromAcc, toAcc, timestamp, amount, fKey, tKey, "DONE"))
+          payzDb.updateTransStatus(Trans(tId, fromAcc, toAcc, timestamp, amount, fKey, tKey, "DONE"))
           Some("DONE")
         case _ =>
           None
@@ -97,7 +97,7 @@ trait TransHandlerComp {
         case Some("DONE") =>
           // transfer money is error prone
           try {
-            transDb.transferMoney(trans)
+            payzDb.transferMoney(trans)
             sendResponse("PUTDONE")
           } catch {
             case ex: Exception =>
