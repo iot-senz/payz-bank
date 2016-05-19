@@ -17,7 +17,7 @@ trait PayzDbComp {
 
     def createTrans(trans: Trans)
 
-    def updateTrans(trans: Trans)
+    def updateTransStatus(trans: Trans)
 
     def getTrans(tId: String): Option[Trans]
 

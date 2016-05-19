@@ -2,7 +2,7 @@ package handlers
 
 import actors.RegHandler.{RegDone, RegFail, Registered}
 import actors._
-import akka.actor.ActorContext
+import akka.actor.{ActorRef, ActorContext}
 import db.{CassandraPayzDbComp, PayzDbComp, PayzCassandraCluster}
 import org.slf4j.LoggerFactory
 import protocols.{Senz, SenzType, SignatureVerificationFail}
@@ -14,6 +14,8 @@ class SenzHandler {
   def logger = LoggerFactory.getLogger(this.getClass)
 
   object Handler {
+
+    val actorRefs = scala.collection.mutable.Map[String, ActorRef]()
 
     def handle(senz: Senz)(implicit context: ActorContext) = {
       senz match {
@@ -53,22 +55,40 @@ class SenzHandler {
     }
 
     def handlePut(senz: Senz)(implicit context: ActorContext) = {
-      // create trans form senz
-      val trans = TransUtils.getTrans(senz)
+      // match for attr to check weather PUT is for
+      //    1. first trans PUT
+      //    2. second random key PUT
+      if (senz.attributes.contains("acc") && senz.attributes.contains("amnt")) {
+        // first trans PUT
+        // create trans form senz
+        val trans = TransUtils.getTrans(senz)
 
-      // check trans exists
-      transDb.getTrans(trans.tId) match {
-        case Some(existingTrans) =>
-          // already existing trans
-          logger.debug("Trans exists, no need to recreate: " + "[" + existingTrans.fromAcc + ", " + existingTrans.toAcc + ", " + existingTrans.amount + "]")
-        case None =>
-          // new trans, so create and process it
-          logger.debug("New Trans, process it: " + "[" + trans.fromAcc + ", " + trans.toAcc + ", " + trans.amount + "]")
+        // check trans exists
+        transDb.getTrans(trans.tId) match {
+          case Some(existingTrans) =>
+            // already existing trans
+            logger.debug("Trans exists, no need to recreate: " + "[" + existingTrans.fromAcc + ", " + existingTrans.toAcc + ", " + existingTrans.amount + "]")
+          case None =>
+            // new trans, so create and process it
+            logger.debug("New Trans, process it: " + "[" + trans.fromAcc + ", " + trans.toAcc + ", " + trans.amount + "]")
 
-          // transaction request via trans actor
-          val transHandlerComp = new TransHandlerComp with CassandraPayzDbComp with PayzCassandraCluster
-          context.actorOf(transHandlerComp.TransHandler.props(trans))
+            // transaction request via trans actor
+            val transHandlerComp = new TransHandlerComp with CassandraPayzDbComp with PayzCassandraCluster
+            val actorRef = context.actorOf(transHandlerComp.TransHandler.props(trans))
+
+            // store actor in map
+            actorRefs(trans.tId) = actorRef
+        }
+      } else if (senz.attributes.contains("key") && senz.attributes.contains("tid")) {
+        // second random key PUT
+        // create Matm from senz
+        val matm = TransUtils.getMatm(senz)
+
+        // send Matm to actor
+        val actorRef = actorRefs(matm.tId)
+        actorRef ! matm
       }
+
     }
 
     def handleData(senz: Senz)(implicit context: ActorContext) = {

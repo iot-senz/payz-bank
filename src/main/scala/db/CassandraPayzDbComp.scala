@@ -71,7 +71,7 @@ trait CassandraPayzDbComp extends PayzDbComp {
       session.execute(statement)
     }
 
-    override def updateTrans(trans: Trans) = {
+    override def updateTransStatus(trans: Trans) = {
       // update query
       val updateStmt = QueryBuilder.update("trans")
         .`with`(set("status", trans.status))

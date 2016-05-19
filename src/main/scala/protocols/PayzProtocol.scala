@@ -10,3 +10,5 @@ import AccType._
 case class Acc(name: String, balance: Int, accType: AccType)
 
 case class Trans(tId: String, fromAcc: String, toAcc: String, timestamp: String, amount: Int, fKey: String, tKey: String, status: String)
+
+case class Matm(tId: String, key: String, acc: String)

@@ -1,6 +1,6 @@
 package utils
 
-import protocols.{Senz, Trans}
+import protocols.{Matm, Senz, Trans}
 
 import scala.util.Random
 import scala.math.log10
@@ -21,6 +21,14 @@ object TransUtils {
     val tKey = getKey(4)
 
     Trans(tId, fromAcc, toAcc, timestamp, amount, fKey, tKey, "PENDING")
+  }
+
+  def getMatm(senz: Senz): Matm = {
+    val tId = senz.attributes.getOrElse("tid", "")
+    val key = senz.attributes.getOrElse("key", "")
+    val user = senz.sender
+
+    Matm(tId, key, user)
   }
 
   private def getKey(id: Int): String = {
