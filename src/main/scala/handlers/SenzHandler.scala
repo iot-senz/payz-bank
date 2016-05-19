@@ -57,13 +57,13 @@ class SenzHandler {
       val trans = TransUtils.getTrans(senz)
 
       // check trans exists
-      transDb.getTrans(trans.from_acc, trans.timestamp) match {
+      transDb.getTrans(trans.fromAcc, trans.timestamp) match {
         case Some(existingTrans) =>
           // already existing trans
-          logger.debug("Trans exists, no need to recreate: " + "[" + existingTrans.from_acc + ", " + existingTrans.to_acc + ", " + existingTrans.amount + "]")
+          logger.debug("Trans exists, no need to recreate: " + "[" + existingTrans.fromAcc + ", " + existingTrans.toAcc + ", " + existingTrans.amount + "]")
         case None =>
           // new trans, so create and process it
-          logger.debug("New Trans, process it: " + "[" + trans.from_acc + ", " + trans.to_acc + ", " + trans.amount + "]")
+          logger.debug("New Trans, process it: " + "[" + trans.fromAcc + ", " + trans.toAcc + ", " + trans.amount + "]")
 
           // transaction request via trans actor
           val transHandlerComp = new TransHandlerComp with CassandraPayzDbComp with PayzCassandraCluster

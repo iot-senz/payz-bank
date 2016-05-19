@@ -42,7 +42,7 @@ trait TransHandlerComp {
 
     override def receive: Receive = {
       case InitTrans(trans) =>
-        logger.info("InitTrans: [" + trans.from_acc + "] [" + trans.to_acc + "] [" + trans.amount + "]")
+        logger.info("InitTrans: [" + trans.fromAcc + "] [" + trans.toAcc + "] [" + trans.amount + "]")
 
         // TODO handle according to MATM protocol
 
@@ -65,7 +65,7 @@ trait TransHandlerComp {
 
     def sendResponse(status: String) = {
       // send status back
-      val senz = s"DATA #msg $status @${trans.from_acc} ^payzbank"
+      val senz = s"DATA #msg $status @${trans.fromAcc} ^payzbank"
       senzSender ! SenzMsg(senz)
     }
   }

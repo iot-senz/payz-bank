@@ -9,4 +9,4 @@ import AccType._
 
 case class Acc(name: String, balance: Int, accType: AccType)
 
-case class Trans(from_acc: String, to_acc: String, amount: Int, timestamp: String, status: String)
+case class Trans(tId: String, fromAcc: String, toAcc: String, timestamp: String, amount: Int, fKey: String, tKey: String, status: String)

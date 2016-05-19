@@ -27,7 +27,7 @@ trait CassandraPayzDbComp extends PayzDbComp {
       val sqlCreateTableAcc = "CREATE TABLE IF NOT EXISTS acc(name TEXT PRIMARY KEY, balance Int, acc_type TEXT);"
 
       // queries to create trans
-      val sqlCreateTableTrans = "CREATE TABLE IF NOT EXISTS trans(from_acc TEXT, to_acc TEXT, amount INT, timestamp TEXT, status TEXT,PRIMARY KEY(from_acc, timestamp));"
+      val sqlCreateTableTrans = "CREATE TABLE IF NOT EXISTS trans(t_id TEXT, from_acc TEXT, to_acc TEXT, timestamp TEXT, amount INT, f_key, t_key, status TEXT, PRIMARY KEY(from_acc, to_acc, timestamp));"
 
       val sqlCreateIndexTransStatus = "CREATE INDEX trans_status on trans(status);"
     }
@@ -59,10 +59,13 @@ trait CassandraPayzDbComp extends PayzDbComp {
     override def createTrans(trans: Trans) = {
       // insert query
       val statement = QueryBuilder.insertInto("trans")
-        .value("from_acc", trans.from_acc)
-        .value("to_acc", trans.to_acc)
-        .value("amount", trans.amount)
+        .value("t_id", trans.tId)
+        .value("from_acc", trans.fromAcc)
+        .value("to_acc", trans.toAcc)
         .value("timestamp", trans.timestamp)
+        .value("amount", trans.amount)
+        .value("f_key", trans.fKey)
+        .value("t_key", trans.tKey)
         .value("status", trans.status)
 
       session.execute(statement)
@@ -72,7 +75,7 @@ trait CassandraPayzDbComp extends PayzDbComp {
       // update query
       val updateStmt = QueryBuilder.update("trans")
         .`with`(set("status", trans.status))
-        .where(QueryBuilder.eq("timestamp", trans.timestamp)).and(QueryBuilder.eq("name", trans.from_acc))
+        .where(QueryBuilder.eq("timestamp", trans.timestamp)).and(QueryBuilder.eq("name", trans.fromAcc))
 
       session.execute(updateStmt)
     }
@@ -87,14 +90,21 @@ trait CassandraPayzDbComp extends PayzDbComp {
       val resultSet = session.execute(selectStmt)
       val row = resultSet.one()
 
-      if (row != null) Some(Trans(row.getString("from_acc"), row.getString("to_acc"), row.getInt("amount"), row.getString("timestamp"), row.getString("status")))
+      if (row != null) Some(Trans(row.getString("t_id"),
+        row.getString("from_acc"),
+        row.getString("to_acc"),
+        row.getString("timestamp"),
+        row.getInt("amount"),
+        row.getString("f_key"),
+        row.getString("t_key"),
+        row.getString("status")))
       else None
     }
 
     override def transferMoney(trans: Trans) = {
       // find accounts
-      val from_acc = getAcc(trans.from_acc)
-      val to_acc = getAcc(trans.to_acc)
+      val from_acc = getAcc(trans.fromAcc)
+      val to_acc = getAcc(trans.toAcc)
 
       // validate from accounts
       from_acc match {
@@ -118,8 +128,8 @@ trait CassandraPayzDbComp extends PayzDbComp {
       if (to_acc.isEmpty) throw new Exception("No to_acc")
 
       // came here means no error, so update accounts
-      updateAcc(trans.from_acc, from_acc.get.balance - trans.amount)
-      updateAcc(trans.to_acc, to_acc.get.balance + trans.amount)
+      updateAcc(trans.fromAcc, from_acc.get.balance - trans.amount)
+      updateAcc(trans.toAcc, to_acc.get.balance + trans.amount)
     }
 
     private def updateAcc(name: String, amount: Int) = {
