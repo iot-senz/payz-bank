@@ -27,7 +27,7 @@ trait CassandraPayzDbComp extends PayzDbComp {
       val sqlCreateTableAcc = "CREATE TABLE IF NOT EXISTS acc(name TEXT PRIMARY KEY, balance Int, acc_type TEXT);"
 
       // queries to create trans
-      val sqlCreateTableTrans = "CREATE TABLE IF NOT EXISTS trans(t_id TEXT PRIMARY KEY, from_acc TEXT, to_acc TEXT, timestamp TEXT, amount INT, f_key, t_key, status TEXT);"
+      val sqlCreateTableTrans = "CREATE TABLE IF NOT EXISTS trans(t_id TEXT PRIMARY KEY, from_acc TEXT, to_acc TEXT, timestamp TEXT, amount INT, f_key TEXT, t_key TEXT, status TEXT);"
 
       val sqlCreateIndexTransStatus = "CREATE INDEX trans_status on trans(status);"
     }

@@ -17,13 +17,13 @@ object TransUtils {
 
     // generate two random no's
     // this requires when handing trans with MATM protocol
-    val fKey = getRand(4)
-    val tKey = getRand(4)
+    val fKey = getKey(4)
+    val tKey = getKey(4)
 
     Trans(tId, fromAcc, toAcc, timestamp, amount, fKey, tKey, "PENDING")
   }
 
-  private def getRand(id: Int): String = {
+  private def getKey(id: Int): String = {
     val size = (log10(id) + 4).toInt
     Random.alphanumeric.take(Random.nextInt(size) + 1).mkString
   }
