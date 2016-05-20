@@ -2,20 +2,18 @@ package handlers
 
 import actors.RegHandler.{RegDone, RegFail, Registered}
 import actors._
-import akka.actor.{ActorRef, ActorContext}
-import db.{CassandraPayzDbComp, PayzDbComp, PayzCassandraCluster}
+import akka.actor.ActorContext
+import db.{CassandraPayzDbComp, PayzCassandraCluster, PayzDbComp}
 import org.slf4j.LoggerFactory
 import protocols.{Senz, SenzType, SignatureVerificationFail}
 import utils.TransUtils
 
 class SenzHandler {
-  this: PayzDbComp =>
+  this: PayzDbComp with PayzActorStoreComp =>
 
   def logger = LoggerFactory.getLogger(this.getClass)
 
   object Handler {
-
-    val actorRefs = scala.collection.mutable.Map[String, ActorRef]()
 
     def handle(senz: Senz)(implicit context: ActorContext) = {
       senz match {
@@ -63,8 +61,8 @@ class SenzHandler {
         // create Trans form senz
         val trans = TransUtils.getTrans(senz)
 
-        actorRefs(trans.tId) match {
-          case actorRef: ActorRef =>
+        actorStore.getActor(trans.tId) match {
+          case Some(actorRef) =>
             // have actor to handle the trans with this id
             actorRef ! trans
           case _ =>
@@ -73,7 +71,7 @@ class SenzHandler {
             val actorRef = context.actorOf(transHandlerComp.TransHandler.props(trans))
 
             // store actor in map
-            actorRefs(trans.tId) = actorRef
+            actorStore.addActor(trans.tId, actorRef)
 
             // send trans to created actor
             actorRef ! trans
@@ -84,8 +82,8 @@ class SenzHandler {
         val matm = TransUtils.getMatm(senz)
 
         // send Matm to actor
-        val actorRef = actorRefs(matm.tId)
-        actorRef ! matm
+        val actorRef = actorStore.getActor(matm.tId)
+        actorRef.get ! matm
       }
     }
 

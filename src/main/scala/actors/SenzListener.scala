@@ -21,7 +21,7 @@ class SenzListener(socket: DatagramSocket) extends Actor {
 
   import SenzListener._
 
-  val senzHandler = new SenzHandler with CassandraPayzDbComp with PayzCassandraCluster
+  val senzHandler = new SenzHandler with CassandraPayzDbComp with PayzCassandraCluster with PayzActorStoreComp
 
   def logger = LoggerFactory.getLogger(this.getClass)
 
