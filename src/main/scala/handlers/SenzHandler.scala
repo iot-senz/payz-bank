@@ -69,7 +69,7 @@ class SenzHandler {
             actorRef ! trans
           case _ =>
             // no matching actor to handle the trans, so create actor
-            val transHandlerComp = new TransHandlerComp with CassandraPayzDbComp with PayzCassandraCluster
+            val transHandlerComp = new TransHandlerComp with CassandraPayzDbComp with PayzCassandraCluster with PayzActorStoreComp
             val actorRef = context.actorOf(transHandlerComp.TransHandler.props(trans))
 
             // store actor in map

@@ -5,8 +5,7 @@ import akka.actor.{Actor, Props}
 import config.Configuration
 import db.PayzDbComp
 import org.slf4j.LoggerFactory
-import protocols.{Senz, Matm, Trans}
-import utils.TransUtils
+import protocols.{Matm, Trans}
 
 import scala.concurrent.duration._
 
@@ -14,7 +13,7 @@ case class TransTimeout()
 
 trait TransHandlerComp {
 
-  this: PayzDbComp =>
+  this: PayzDbComp with ActorStoreComp =>
 
   object TransHandler {
     def props(trans: Trans): Props = Props(new TransHandler(trans))
@@ -57,6 +56,8 @@ trait TransHandlerComp {
 
             // handle according to MATM protocol
             processTransResponse(trans)
+
+            actorStore.getActor("234")
         }
       case matm: Matm =>
         matm.acc match {
@@ -79,9 +80,10 @@ trait TransHandlerComp {
         // timeout
         logger.error("TransTimeout")
 
-      // TODO send error back
-      // TODO remove actorRef from map
+        // TODO send error back
 
+        // remove actorRef from map
+        actorStore.removeActor(trans.tId)
     }
 
     def processTransResponse(trans: Trans) = {
@@ -122,8 +124,6 @@ trait TransHandlerComp {
               senzSender ! SenzMsg(s"DATA #msg FAIL @${trans.fromAcc} ^payzbank")
               senzSender ! SenzMsg(s"DATA #msg FAIL @${trans.toAcc} ^payzbank")
           }
-
-        // send
         case _ =>
         // nothing to do
       }
