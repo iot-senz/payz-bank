@@ -5,7 +5,8 @@ import akka.actor.{Actor, Props}
 import config.Configuration
 import db.PayzDbComp
 import org.slf4j.LoggerFactory
-import protocols.{Matm, Trans}
+import protocols.{Senz, Matm, Trans}
+import utils.TransUtils
 
 import scala.concurrent.duration._
 
@@ -42,11 +43,21 @@ trait TransHandlerComp {
       case trans: Trans =>
         logger.info("InitTrans: [" + trans.fromAcc + "] [" + trans.toAcc + "] [" + trans.amount + "]")
 
-        // create trans in db
-        payzDb.createTrans(trans)
+        // check trans exists
+        payzDb.getTrans(trans.tId) match {
+          case Some(existingTrans) =>
+            // already existing trans
+            logger.debug("Trans exists, no need to recreate: " + "[" + existingTrans.fromAcc + ", " + existingTrans.toAcc + ", " + existingTrans.amount + "]")
+          case None =>
+            // new trans, so create and process it
+            logger.debug("New Trans, process it: " + "[" + trans.fromAcc + ", " + trans.toAcc + ", " + trans.amount + "]")
 
-        // handle according to MATM protocol
-        processTransResponse(trans)
+            // create trans in db
+            payzDb.createTrans(trans)
+
+            // handle according to MATM protocol
+            processTransResponse(trans)
+        }
       case matm: Matm =>
         matm.acc match {
           case trans.fromAcc =>
@@ -67,6 +78,10 @@ trait TransHandlerComp {
       case TransTimeout =>
         // timeout
         logger.error("TransTimeout")
+
+      // TODO send error back
+      // TODO remove actorRef from map
+
     }
 
     def processTransResponse(trans: Trans) = {
@@ -107,8 +122,10 @@ trait TransHandlerComp {
               senzSender ! SenzMsg(s"DATA #msg FAIL @${trans.fromAcc} ^payzbank")
               senzSender ! SenzMsg(s"DATA #msg FAIL @${trans.toAcc} ^payzbank")
           }
+
+        // send
         case _ =>
-          // nothing to do
+        // nothing to do
       }
     }
   }

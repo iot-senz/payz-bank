@@ -56,31 +56,30 @@ class SenzHandler {
 
     def handlePut(senz: Senz)(implicit context: ActorContext) = {
       // match for attr to check weather PUT is for
-      //    1. first trans PUT
-      //    2. second random key PUT
+      //    1. first Trans PUT
+      //    2. second Matm PUT
       if (senz.attributes.contains("acc") && senz.attributes.contains("amnt")) {
-        // first trans PUT
-        // create trans form senz
+        // first Trans PUT
+        // create Trans form senz
         val trans = TransUtils.getTrans(senz)
 
-        // check trans exists
-        payzDb.getTrans(trans.tId) match {
-          case Some(existingTrans) =>
-            // already existing trans
-            logger.debug("Trans exists, no need to recreate: " + "[" + existingTrans.fromAcc + ", " + existingTrans.toAcc + ", " + existingTrans.amount + "]")
-          case None =>
-            // new trans, so create and process it
-            logger.debug("New Trans, process it: " + "[" + trans.fromAcc + ", " + trans.toAcc + ", " + trans.amount + "]")
-
-            // transaction request via trans actor
+        actorRefs(trans.tId) match {
+          case actorRef: ActorRef =>
+            // have actor to handle the trans with this id
+            actorRef ! trans
+          case _ =>
+            // no matching actor to handle the trans, so create actor
             val transHandlerComp = new TransHandlerComp with CassandraPayzDbComp with PayzCassandraCluster
             val actorRef = context.actorOf(transHandlerComp.TransHandler.props(trans))
 
             // store actor in map
             actorRefs(trans.tId) = actorRef
+
+            // send trans to created actor
+            actorRef ! trans
         }
       } else if (senz.attributes.contains("key") && senz.attributes.contains("tid")) {
-        // second random key PUT
+        // second Matm PUT
         // create Matm from senz
         val matm = TransUtils.getMatm(senz)
 
@@ -88,7 +87,6 @@ class SenzHandler {
         val actorRef = actorRefs(matm.tId)
         actorRef ! matm
       }
-
     }
 
     def handleData(senz: Senz)(implicit context: ActorContext) = {
