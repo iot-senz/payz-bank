@@ -2,7 +2,8 @@ package actors
 
 import akka.actor.SupervisorStrategy.{Stop, Restart}
 import akka.actor.{OneForOneStrategy, Actor, Props}
-import db.{CassandraPayzDbComp, PayzCassandraCluster}
+import components.CassandraPayzDbComp
+import config.PayzCassandraCluster
 import exceptions.EmptySenzException
 import org.slf4j.LoggerFactory
 import utils.SenzUtils

@@ -17,8 +17,8 @@ object TransUtils {
 
     // generate two random no's
     // this requires when handing trans with MATM protocol
-    val fKey = getKey(4)
-    val tKey = getKey(4)
+    val fKey = getKey(1)
+    val tKey = getKey(1)
 
     Trans(tId, fromAcc, toAcc, timestamp, amount, fKey, tKey, "INIT")
   }

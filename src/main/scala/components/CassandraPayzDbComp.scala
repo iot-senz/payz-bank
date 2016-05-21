@@ -1,7 +1,8 @@
-package db
+package components
 
 import com.datastax.driver.core.querybuilder.QueryBuilder
 import com.datastax.driver.core.querybuilder.QueryBuilder._
+import config.PayzCassandraCluster
 import protocols.{AccType, Acc, Trans}
 
 /**

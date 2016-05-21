@@ -3,7 +3,7 @@ package actors
 import actors.SenzSender.SenzMsg
 import akka.actor.{Actor, Props}
 import config.Configuration
-import db.PayzDbComp
+import components.{ActorStoreComp, PayzDbComp}
 import org.slf4j.LoggerFactory
 import protocols.{Matm, Trans}
 
@@ -78,15 +78,15 @@ trait TransHandlerComp {
         // timeout
         logger.error("TransTimeout")
 
-        // TODO send error back
+        // TODO may be send status back
 
         // remove actorRef from map
         actorStore.removeActor(trans.tId)
     }
 
     def sendTransResponse(trans: Trans) = {
-      senzSender ! SenzMsg(s"DATA #tid ${trans.tId} #key ${trans.fKey} @${trans.fromAcc} ^payzbank}")
-      senzSender ! SenzMsg(s"DATA #tid ${trans.tId} #key ${trans.tKey} @${trans.toAcc} ^payzbank}")
+      senzSender ! SenzMsg(s"DATA #tid ${trans.tId} #key ${trans.fKey} @${trans.fromAcc} ^payzbank")
+      senzSender ! SenzMsg(s"DATA #tid ${trans.tId} #key ${trans.tKey} @${trans.toAcc} ^payzbank")
     }
 
     def processMatm(matm: Matm): Option[String] = {

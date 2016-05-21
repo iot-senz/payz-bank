@@ -1,7 +1,6 @@
-package db
+package config
 
-import com.datastax.driver.core.{PoolingOptions, HostDistance, Cluster, Session}
-import config.Configuration
+import com.datastax.driver.core.{Cluster, HostDistance, PoolingOptions, Session}
 
 /**
  * Cassandra database related configuration, we wrapped them with

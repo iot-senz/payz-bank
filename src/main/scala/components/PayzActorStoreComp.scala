@@ -1,4 +1,4 @@
-package actors
+package components
 
 import akka.actor.ActorRef
 

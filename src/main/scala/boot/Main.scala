@@ -5,6 +5,7 @@ import java.net.DatagramSocket
 import actors.SenzSender.InitSender
 import actors._
 import akka.actor.ActorSystem
+import components.PayzActorStoreComp
 import crypto.RSAUtils
 import org.slf4j.LoggerFactory
 

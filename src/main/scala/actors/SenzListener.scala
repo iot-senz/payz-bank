@@ -5,7 +5,8 @@ import java.net.{DatagramPacket, DatagramSocket}
 import actors.RegHandler.{RegDone, RegFail, Registered}
 import akka.actor.SupervisorStrategy.{Restart, Stop}
 import akka.actor.{Actor, OneForOneStrategy, Props}
-import db.{CassandraPayzDbComp, PayzCassandraCluster}
+import components.{PayzActorStoreComp, ActorStoreComp, CassandraPayzDbComp}
+import config.PayzCassandraCluster
 import org.slf4j.LoggerFactory
 import protocols.{Senz, SenzType, SignatureVerificationFail}
 import utils.{SenzParser, TransUtils}

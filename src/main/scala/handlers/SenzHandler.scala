@@ -3,7 +3,8 @@ package handlers
 import actors.RegHandler.{RegDone, RegFail, Registered}
 import actors._
 import akka.actor.ActorContext
-import db.{CassandraPayzDbComp, PayzCassandraCluster, PayzDbComp}
+import components.{PayzActorStoreComp, CassandraPayzDbComp, PayzDbComp}
+import config.PayzCassandraCluster
 import org.slf4j.LoggerFactory
 import protocols.{Senz, SenzType, SignatureVerificationFail}
 import utils.TransUtils
