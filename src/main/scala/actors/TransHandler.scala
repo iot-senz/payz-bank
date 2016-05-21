@@ -32,7 +32,7 @@ trait TransHandlerComp {
     val transCancellable = system.scheduler.scheduleOnce(0 seconds, self, trans)
 
     // handle timeout in 5 seconds
-    val timeoutCancellable = system.scheduler.scheduleOnce(60 seconds, self, TransTimeout)
+    val timeoutCancellable = system.scheduler.scheduleOnce(40 seconds, self, TransTimeout)
 
     override def preStart() = {
       logger.info("[_________START ACTOR__________] " + context.self.path)
@@ -54,10 +54,8 @@ trait TransHandlerComp {
             // create trans in db
             payzDb.createTrans(trans)
 
-            // handle according to MATM protocol
-            processTransResponse(trans)
-
-            actorStore.getActor("234")
+            // send trans response
+            sendTransResponse(trans)
         }
       case matm: Matm =>
         matm.acc match {
@@ -66,14 +64,14 @@ trait TransHandlerComp {
             if (matm.key == trans.tKey) {
               // valid key exchange
               val status = processMatm(matm)
-              processMatmResponse(status, trans)
+              sendMatmResponse(status, trans)
             }
           case trans.toAcc =>
             // send by shop
             if (matm.key == trans.fKey) {
               // valid key exchange
               val status = processMatm(matm)
-              processMatmResponse(status, trans)
+              sendMatmResponse(status, trans)
             }
         }
       case TransTimeout =>
@@ -86,7 +84,7 @@ trait TransHandlerComp {
         actorStore.removeActor(trans.tId)
     }
 
-    def processTransResponse(trans: Trans) = {
+    def sendTransResponse(trans: Trans) = {
       senzSender ! SenzMsg(s"DATA #tid ${trans.tId} #key ${trans.fKey} @${trans.fromAcc} ^payzbank}")
       senzSender ! SenzMsg(s"DATA #tid ${trans.tId} #key ${trans.tKey} @${trans.toAcc} ^payzbank}")
     }
@@ -109,7 +107,7 @@ trait TransHandlerComp {
       }
     }
 
-    def processMatmResponse(status: Option[String], trans: Trans) = {
+    def sendMatmResponse(status: Option[String], trans: Trans) = {
       status match {
         case Some("DONE") =>
           // transfer money now

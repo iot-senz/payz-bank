@@ -20,7 +20,7 @@ object TransUtils {
     val fKey = getKey(4)
     val tKey = getKey(4)
 
-    Trans(tId, fromAcc, toAcc, timestamp, amount, fKey, tKey, "PENDING")
+    Trans(tId, fromAcc, toAcc, timestamp, amount, fKey, tKey, "INIT")
   }
 
   def getMatm(senz: Senz): Matm = {
