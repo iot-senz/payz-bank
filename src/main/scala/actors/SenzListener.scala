@@ -89,15 +89,21 @@ trait SenzListenerComp {
       //    1. first Trans PUT
       //    2. second Matm PUT
       if (senz.attributes.contains("acc") && senz.attributes.contains("amnt")) {
+        logger.info("PUT senz with #acc #amnt")
+
         // first Trans PUT
         // create Trans form senz
         val trans = TransUtils.getTrans(senz)
 
         actorStore.getActor(trans.tId) match {
           case Some(actorRef) =>
+            logger.info(s"have actor with ${trans.tId}")
+
             // have actor to handle the trans with this id
             actorRef ! trans
           case _ =>
+            logger.info(s"no actor with ${trans.tId}, so create a actor")
+
             // no matching actor to handle the trans, so create actor
             val transHandlerComp = new TransHandlerComp with CassandraPayzDbComp with PayzCassandraCluster with PayzActorStoreComp
             val actorRef = context.actorOf(transHandlerComp.TransHandler.props(trans))
@@ -109,6 +115,8 @@ trait SenzListenerComp {
             actorRef ! trans
         }
       } else if (senz.attributes.contains("key") && senz.attributes.contains("tid")) {
+        logger.info("PUT senz with #key #tid")
+
         // second Matm PUT
         // create Matm from senz
         val matm = TransUtils.getMatm(senz)

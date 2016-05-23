@@ -40,7 +40,7 @@ trait TransHandlerComp {
 
     override def receive: Receive = {
       case trans: Trans =>
-        logger.info("InitTrans: [" + trans.fromAcc + "] [" + trans.toAcc + "] [" + trans.amount + "]")
+        logger.info("Handle trans: [" + trans.fromAcc + "] [" + trans.toAcc + "] [" + trans.amount + "]")
 
         // check trans exists
         payzDb.getTrans(trans.tId) match {
@@ -58,8 +58,12 @@ trait TransHandlerComp {
             sendTransResponse(trans)
         }
       case matm: Matm =>
+        logger.info(s"Handle matm: [${matm.tId} ][${matm.acc}] [${matm.key}]")
+
         matm.acc match {
           case trans.fromAcc =>
+            logger.info(s"Handle matm sends by USER ${matm.acc}")
+
             // send by user
             if (matm.key == trans.tKey) {
               // valid key exchange
@@ -67,6 +71,8 @@ trait TransHandlerComp {
               sendMatmResponse(status, trans)
             }
           case trans.toAcc =>
+            logger.info(s"Handle matm sends by SHOP ${matm.acc}")
+
             // send by shop
             if (matm.key == trans.fKey) {
               // valid key exchange

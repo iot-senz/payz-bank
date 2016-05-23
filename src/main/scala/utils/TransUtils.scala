@@ -2,9 +2,6 @@ package utils
 
 import protocols.{Matm, Senz, Trans}
 
-import scala.util.Random
-import scala.math.log10
-
 object TransUtils {
   def getTrans(senz: Senz): Trans = {
     val fromAcc = senz.sender
@@ -17,8 +14,8 @@ object TransUtils {
 
     // generate two random no's
     // this requires when handing trans with MATM protocol
-    val fKey = getKey(1)
-    val tKey = getKey(1)
+    val fKey = randomKey(5)
+    val tKey = randomKey(5)
 
     Trans(tId, fromAcc, toAcc, timestamp, amount, fKey, tKey, "INIT")
   }
@@ -31,9 +28,8 @@ object TransUtils {
     Matm(tId, key, user)
   }
 
-  private def getKey(id: Int): String = {
-    val size = (log10(id) + 4).toInt
-    Random.alphanumeric.take(Random.nextInt(size) + 1).mkString
+  private def randomKey(length: Int) = {
+    scala.util.Random.alphanumeric.take(length).mkString
   }
 
 }
